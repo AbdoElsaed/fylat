@@ -1,0 +1,8 @@
+.evenMsg {
+  margin-right: auto;
+  color: "green";
+}
+.oddMsg {
+  margin-left: auto;
+  color: "red";
+}

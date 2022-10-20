@@ -1,0 +1,22 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+  margin-top: 30px;
+}
+.headline {
+  margin-top: 20px;
+  font-family: "NexaHeavyItalic";
+}
+.slogan {
+  margin-top: 10px;
+  font-family: "NexaLightItalic";
+}
+.textInput {
+  width: 85%;
+}
+.btn {
+  font-size: 16px;
+  font-weight: bold;
+}
