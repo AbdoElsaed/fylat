@@ -10,7 +10,7 @@ interface IFile {
 }
 
 interface IMessage {
-  userName: string;
+  sender: string;
   text: string;
 }
 
@@ -34,3 +34,5 @@ type RemoveSessionParams = {
   socketId: string;
   userName: string;
 };
+
+type AddMsgToSession = { text: string; sender: string; sessionId: string };

@@ -1,5 +1,5 @@
 {
-  "name": "client",
+  "name": "fylat_client",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -14,18 +14,18 @@
     "@mui/icons-material": "^5.10.6",
     "@mui/lab": "^5.0.0-alpha.102",
     "@mui/material": "^5.10.6",
-    "next": "12.3.1",
+    "next": "13.0.0",
     "notistack": "^2.0.5",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "socket.io-client": "^4.5.2"
   },
   "devDependencies": {
-    "@types/node": "18.7.18",
-    "@types/react": "18.0.20",
-    "@types/react-dom": "18.0.6",
-    "eslint": "8.23.1",
-    "eslint-config-next": "12.3.1",
-    "typescript": "4.8.3"
+    "@types/node": "18.11.5",
+    "@types/react": "18.0.23",
+    "@types/react-dom": "18.0.7",
+    "eslint": "8.26.0",
+    "eslint-config-next": "13.0.0",
+    "typescript": "4.8.4"
   }
 }

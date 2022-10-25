@@ -1,7 +1,7 @@
 import { Grid, Box, Divider } from "@mui/material";
 import { SessionHeader } from "./SessionHeader";
 import { FilesArea } from "./FilesArea";
-import { Chat, ChatMembers } from "./Chat";
+import { Chat } from "./Chat";
 
 export const Sessions = ({ isNew, userName, id, socket }: any) => {
   return (
@@ -18,11 +18,7 @@ export const Sessions = ({ isNew, userName, id, socket }: any) => {
         </Grid>
         <Divider orientation="vertical" flexItem />
         <Grid item>
-          <Chat />
-        </Grid>
-        <Divider orientation="vertical" flexItem />
-        <Grid item>
-          <ChatMembers />
+          <Chat isNew={isNew} userName={userName} id={id} socket={socket} />
         </Grid>
       </Grid>
     </Box>

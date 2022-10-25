@@ -10,6 +10,8 @@ const {
   checkSessionExist,
   createNewSession,
   addUserToSession,
+  addMsg,
+  getMsgsBySessionId,
 } = require("./utils");
 
 const port = process.env.PORT || 8000;
@@ -25,33 +27,27 @@ const io = new Server(server, {
 app.get("/", (req: Request, res: Response) => res.send("fylat backend"));
 
 const joinSession = ({ sessionId, userName, isNew, socket }: any) => {
-  try {
-    //  check all session cases
-    let sessionExist = checkSessionExist(sessionId);
-    console.log({ sessionExist });
-    const sessions = getAllSessions();
-    console.log({ sessions });
+  //  check all session cases
+  let sessionExist = checkSessionExist(sessionId);
+  const sessions = getAllSessions();
 
-    if (isNew && sessionExist) throw new Error("this session already exists!!");
-    if (isNew && !sessionExist) {
-      createNewSession({
-        sessionId,
-        user: { userName, type: "admin", socketId: socket.id },
-      });
-    }
-    if (!isNew && sessionExist) {
-      addUserToSession({
-        sessionId,
-        user: { userName, type: "member", socketId: socket.id },
-      });
-    }
-    // join a session
-    socket.join(sessionId);
-
-    if (!isNew) io.to(sessionId).emit("newUserJoined", { userName });
-  } catch (err) {
-    console.log(err);
+  if (isNew && sessionExist) throw new Error("this session already exists!!");
+  if (isNew && !sessionExist) {
+    createNewSession({
+      sessionId,
+      user: { userName, type: "admin", socketId: socket.id },
+    });
   }
+  if (!isNew && sessionExist) {
+    addUserToSession({
+      sessionId,
+      user: { userName, type: "member", socketId: socket.id },
+    });
+  }
+  // join a session
+  socket.join(sessionId);
+
+  if (!isNew) io.to(sessionId).emit("newUserJoined", { userName });
 };
 
 io.on("connection", (socket: any) => {
@@ -59,11 +55,11 @@ io.on("connection", (socket: any) => {
 
   socket.on("joinSession", ({ sessionId, userName, isNew }: any, cb: any) => {
     try {
-      console.log(`${userName} joined ${sessionId} session`);
       const session = joinSession({ sessionId, userName, isNew, socket });
-    } catch (err) {
-      console.log(err);
-      cb(err);
+      console.log(`${userName} joined ${sessionId} session`);
+    } catch (err: any) {
+      console.error(err.message);
+      cb(err.message);
     }
   });
 
@@ -74,6 +70,26 @@ io.on("connection", (socket: any) => {
         cb({ message: err ? "failure" : "success" });
       });
     });
+  });
+
+  socket.on("sendChatMsg", ({ msg, userName, sessionId }: any, cb: any) => {
+    try {
+      let msgs = addMsg({ text: msg, sender: userName, sessionId });
+      cb(null, msgs);
+      io.to(sessionId).emit("newMsgAdded", msgs);
+    } catch (err) {
+      console.error(err);
+      cb(err);
+    }
+  });
+
+  socket.on("getInitMsgs", ({ sessionId }: any, cb: any) => {
+    try {
+      let msgs = getMsgsBySessionId(sessionId) ?? [];
+      cb(null, msgs);
+    } catch (err) {
+      cb(err);
+    }
   });
 });
 

@@ -12,8 +12,8 @@ const index = () => {
         <Image
           src="/images/buymeacoffee.png"
           alt="Buy Me A Coffee"
-          height="60px"
-          width="217px"
+          height={60}
+          width={217}
         />
       </a>
     </div>

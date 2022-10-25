@@ -17,8 +17,20 @@ const HeroForm = ({ socket }: any) => {
   const [startBtnLoading, setStartBtnLoading] = useState<boolean>(false);
   const [joinBtnLoading, setJoinBtnLoading] = useState<boolean>(false);
   const [id, setId] = useState<string>("");
+  const [errMsg, setErrMsg] = useState<string | null>(null);
   const [userName, setUserName] = useState<string>("");
   const router = useRouter();
+
+  const goToSession = (isNew: boolean, err: string) => {
+    console.log(err);
+    if (err) {
+      isNew ? setStartBtnLoading(false) : setJoinBtnLoading(false);
+      console.error(err);
+      alert(err);
+    } else {
+      router.push(`/session/${id}?userName=${userName}&isNew=${isNew}`);
+    }
+  };
 
   const joinRoom = (isNew: boolean) => {
     const data = {
@@ -27,16 +39,16 @@ const HeroForm = ({ socket }: any) => {
       isNew,
     };
 
-    socket.emit("joinSession", data, (err: Error) => {
-      if (err) console.log(err);
-      else console.log("user joined room successfully");
+    socket.emit("joinSession", data, (err: any) => {
+      console.log("errrr", err);
+      goToSession(isNew, err);
     });
   };
 
   const handleClick = (isNew: boolean) => {
     isNew ? setStartBtnLoading(true) : setJoinBtnLoading(true);
     joinRoom(isNew);
-    router.push(`/session/${id}?userName=${userName}&isNew=${isNew}`);
+    // goToSession(isNew);
   };
 
   return (

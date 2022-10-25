@@ -86,6 +86,24 @@ const leaveSesion = (
 
 const getAllSessions = () => sessions;
 
+const addMsg = ({ text, sender, sessionId }: AddMsgToSession) => {
+  let { messages } = findSessionById(sessionId) as ISession;
+  messages = [...(messages ?? []), { text, sender }];
+  sessions = sessions.map((s: ISession) => {
+    if (s.sessionId === sessionId) {
+      return { ...s, messages };
+    } else {
+      return s;
+    }
+  });
+  return messages;
+};
+
+const getMsgsBySessionId = (sessionId: string) => {
+  let { messages } = findSessionById(sessionId) as ISession;
+  return messages;
+};
+
 module.exports = {
   getAllSessions,
   checkSessionExist,
@@ -94,4 +112,6 @@ module.exports = {
   isSessionAdmin,
   removeSession,
   leaveSesion,
+  addMsg,
+  getMsgsBySessionId,
 };

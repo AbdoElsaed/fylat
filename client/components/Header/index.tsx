@@ -15,14 +15,12 @@ export default function index() {
       >
         <Grid item>
           <Link href="/">
-            <a>
-              <Image
-                src="/images/logo.png"
-                alt="Logo Image"
-                width={80}
-                height={80}
-              />
-            </a>
+            <Image
+              src="/images/logo.png"
+              alt="Logo Image"
+              width={80}
+              height={80}
+            />
           </Link>
         </Grid>
         <Grid

@@ -1,5 +1,8 @@
 "use strict";
 let sessions = [];
+const findSessionById = (sessionId) => {
+    return sessions.find((s) => s.sessionId === sessionId);
+};
 const checkSessionExist = (sessionId) => {
     return sessions.filter((s) => s.sessionId === sessionId).length
         ? true
@@ -14,16 +17,18 @@ const createNewSession = ({ sessionId, user }) => {
     return session;
 };
 const addUserToSession = ({ sessionId, user }) => {
+    var _a;
+    const newSession = findSessionById(sessionId);
+    (_a = newSession.users) === null || _a === void 0 ? void 0 : _a.push(user);
     sessions = sessions.map((s) => {
         if (s.sessionId === sessionId) {
-            return Object.assign(Object.assign({}, s), { users: [...s.users, user] });
+            return newSession;
         }
         return s;
     });
 };
-const isSessionAdmin = ({ sessionId, socketId, userName }) => {
-    let session = sessions.map((s) => s.sessionId === sessionId);
-    let { users } = session;
+const isSessionAdmin = ({ sessionId, socketId, userName, }) => {
+    let { users } = findSessionById(sessionId);
     return users.find((u) => u.socketId === socketId && u.userName === userName)
         ? true
         : false;
@@ -47,8 +52,10 @@ const leaveSesion = ({ sessionId, socketId, userName }, cb) => {
             return removeSession({ sessionId, socketId, userName }, () => { });
         }
         sessions = sessions.map((s) => {
+            var _a;
             if (s.sessionId === sessionId) {
-                return Object.assign({}, s);
+                let users = (_a = s.users) === null || _a === void 0 ? void 0 : _a.filter((u) => u.userName !== userName);
+                return Object.assign(Object.assign({}, s), { users });
             }
             return s;
         });
@@ -59,6 +66,23 @@ const leaveSesion = ({ sessionId, socketId, userName }, cb) => {
     }
 };
 const getAllSessions = () => sessions;
+const addMsg = ({ text, sender, sessionId }) => {
+    let { messages } = findSessionById(sessionId);
+    messages = [...(messages !== null && messages !== void 0 ? messages : []), { text, sender }];
+    sessions = sessions.map((s) => {
+        if (s.sessionId === sessionId) {
+            return Object.assign(Object.assign({}, s), { messages });
+        }
+        else {
+            return s;
+        }
+    });
+    return messages;
+};
+const getMsgsBySessionId = (sessionId) => {
+    let { messages } = findSessionById(sessionId);
+    return messages;
+};
 module.exports = {
     getAllSessions,
     checkSessionExist,
@@ -67,4 +91,6 @@ module.exports = {
     isSessionAdmin,
     removeSession,
     leaveSesion,
+    addMsg,
+    getMsgsBySessionId,
 };
