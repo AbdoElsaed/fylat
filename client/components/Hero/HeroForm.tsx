@@ -20,7 +20,6 @@ const HeroForm = ({ socket }: any) => {
   const router = useRouter();
 
   const goToSession = (isNew: boolean, err: string) => {
-    console.log(err);
     if (err) {
       isNew ? setStartBtnLoading(false) : setJoinBtnLoading(false);
       console.error(err);
@@ -38,7 +37,6 @@ const HeroForm = ({ socket }: any) => {
     };
 
     socket.emit("joinSession", data, (err: any) => {
-      console.log("errrr", err);
       goToSession(isNew, err);
     });
   };

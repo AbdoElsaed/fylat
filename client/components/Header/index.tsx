@@ -3,7 +3,7 @@ import Link from "next/link";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import GitHubIcon from "@mui/icons-material/GitHub";
-import BuyMeACoffee from "@/components/BuyMeACoffee";
+import CoffeeIcon from "@mui/icons-material/Coffee";
 
 export default function index() {
   return (
@@ -29,7 +29,7 @@ export default function index() {
           sx={{
             width: "15%",
             display: "flex",
-            justifyContent: "space-between",
+            justifyContent: "center",
             alignItems: "center",
           }}
         >
@@ -38,9 +38,16 @@ export default function index() {
             rel="noopener noreferrer"
             target="_blank"
           >
-            <GitHubIcon sx={{ fontSize: "40px" }} />
+            <GitHubIcon sx={{ fontSize: "40px", color: "#888" }} />
           </a>
-          <BuyMeACoffee />
+          <a
+            href="https://www.buymeacoffee.com/gatsbybom"
+            target="_blank"
+            rel="noreferrer"
+            title="Buy me a coffee"
+          >
+            <CoffeeIcon sx={{ fontSize: "40px", color: "#888" }} />
+          </a>
         </Grid>
       </Grid>
     </Box>

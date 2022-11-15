@@ -57,6 +57,7 @@ io.on("connection", (socket: any) => {
     try {
       const session = joinSession({ sessionId, userName, isNew, socket });
       console.log(`${userName} joined ${sessionId} session`);
+      cb(null);
     } catch (err: any) {
       console.error(err.message);
       cb(err.message);

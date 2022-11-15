@@ -18,7 +18,6 @@ export const Sessions = ({ isNew, userName, id, socket }: any) => {
             socket={socket}
           />
         </Grid>
-        <Divider orientation="vertical" flexItem />
         <Grid item>
           <Chat isNew={isNew} userName={userName} id={id} socket={socket} />
         </Grid>

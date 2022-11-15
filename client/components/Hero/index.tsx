@@ -4,9 +4,12 @@ import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import Image from "next/image";
 
+import { useDeviceDetect } from "@/utils/hooks";
 import HeroForm from "./HeroForm";
 
-const index = ({ socket }: any) => {
+const Hero = ({ socket }: any) => {
+  const isMobile = useDeviceDetect();
+  console.log({ isMobile });
   return (
     <Box className={styles.container}>
       <Grid container justifyContent="space-around">
@@ -15,7 +18,7 @@ const index = ({ socket }: any) => {
             Sharing is caring
           </Typography>
           <Typography variant="h4" className={styles.slogan}>
-            Start sharing things with your friends in a fun way
+            Start sharing files with your friends in a fun way
           </Typography>
           <HeroForm socket={socket} />
         </Grid>
@@ -23,8 +26,8 @@ const index = ({ socket }: any) => {
           <Image
             src="/images/bg.png"
             alt="Logo Image"
-            width={600}
-            height={600}
+            width={isMobile ? 400 : 600}
+            height={isMobile ? 400 : 600}
           />
         </Grid>
       </Grid>
@@ -32,4 +35,4 @@ const index = ({ socket }: any) => {
   );
 };
 
-export default index;
+export default Hero;
