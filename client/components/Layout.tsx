@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
-import { Divider } from "@mui/material";
+import Divider from "@mui/material/Divider";
 import { SnackbarProvider } from "notistack";
 
 import Header from "./Header";

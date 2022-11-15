@@ -1,14 +1,12 @@
 import React, { useState } from "react";
-import {
-  Box,
-  Button,
-  Grid,
-  IconButton,
-  List,
-  ListItem,
-  ListItemText,
-  Typography,
-} from "@mui/material";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Grid from "@mui/material/Grid";
+import IconButton from "@mui/material/IconButton";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemText from "@mui/material/ListItemText";
+import Typography from "@mui/material/Typography";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import DownloadIcon from "@mui/icons-material/Download";
 
@@ -23,7 +21,7 @@ export const FilesArea = ({ isNew, userName, id, socket }: any) => {
     const formattedFiles = formatFiles(files);
     socket.emit(
       "uploadfile",
-      { files: formattedFiles, sessionId: id, },
+      { files: formattedFiles, sessionId: id },
       (status: any) => {
         console.log(status);
       }

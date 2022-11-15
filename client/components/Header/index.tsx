@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Box, Grid } from "@mui/material";
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import BuyMeACoffee from "@/components/BuyMeACoffee";
 

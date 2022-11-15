@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from "react";
-import { Grid, Typography, Stack } from "@mui/material";
-import { Box } from "@mui/system";
+import Grid from "@mui/material/Grid";
+import Typography from "@mui/material/Typography";
+import Stack from "@mui/material/Stack";
+import Box from "@mui/material/Box";
 import styles from "@/styles/Chat.module.css";
 import IconButton from "@mui/material/IconButton";
 import TextField from "@mui/material/TextField";

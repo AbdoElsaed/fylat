@@ -1,4 +1,6 @@
-import { Grid, Box, Divider } from "@mui/material";
+import Grid from "@mui/material/Grid";
+import Box from "@mui/material/Box";
+import Divider from "@mui/material/Divider";
 import { SessionHeader } from "./SessionHeader";
 import { FilesArea } from "./FilesArea";
 import { Chat } from "./Chat";

@@ -1,12 +1,10 @@
 import { useState } from "react";
 import styles from "@/styles/Hero.module.css";
-import { Stack, TextField } from "@mui/material";
+import Stack from "@mui/material/Stack";
+import TextField from "@mui/material/TextField";
 import LoadingButton from "@mui/lab/LoadingButton";
-import {
-  AddCircle as AddCircleIcon,
-  ArrowCircleDown as ArrowCircleDownIcon,
-} from "@mui/icons-material";
-
+import AddCircle from "@mui/icons-material/AddCircle";
+import ArrowCircleDown from "@mui/icons-material/ArrowCircleDown";
 import { useRouter } from "next/router";
 
 const HeroForm = ({ socket }: any) => {
@@ -91,7 +89,7 @@ const HeroForm = ({ socket }: any) => {
           className={styles.btn}
           variant="contained"
           loadingPosition="end"
-          endIcon={<AddCircleIcon />}
+          endIcon={<AddCircle />}
           loading={startBtnLoading}
         >
           Start a new session
@@ -102,7 +100,7 @@ const HeroForm = ({ socket }: any) => {
           className={styles.btn}
           variant="outlined"
           loadingPosition="end"
-          endIcon={<ArrowCircleDownIcon />}
+          endIcon={<ArrowCircleDown />}
           loading={joinBtnLoading}
         >
           Join an exist session

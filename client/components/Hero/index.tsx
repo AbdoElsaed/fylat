@@ -1,5 +1,7 @@
 import styles from "@/styles/Hero.module.css";
-import { Box, Grid, Typography } from "@mui/material";
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
+import Typography from "@mui/material/Typography";
 import Image from "next/image";
 
 import HeroForm from "./HeroForm";
