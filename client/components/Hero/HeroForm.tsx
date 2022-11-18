@@ -15,8 +15,9 @@ const HeroForm = ({ socket }: any) => {
   const [startBtnLoading, setStartBtnLoading] = useState<boolean>(false);
   const [joinBtnLoading, setJoinBtnLoading] = useState<boolean>(false);
   const [id, setId] = useState<string>("");
-  const [errMsg, setErrMsg] = useState<string | null>(null);
   const [userName, setUserName] = useState<string>("");
+  const [showFormError, setShowFormError] = useState<boolean>(false);
+
   const router = useRouter();
 
   const goToSession = (isNew: boolean, err: string) => {
@@ -42,9 +43,15 @@ const HeroForm = ({ socket }: any) => {
   };
 
   const handleClick = (isNew: boolean) => {
+    if (!id.trim() || !userName.trim()) {
+      setShowFormError(true);
+      setTimeout(() => {
+        setShowFormError(false);
+      }, 2000);
+      return;
+    }
     isNew ? setStartBtnLoading(true) : setJoinBtnLoading(true);
     joinRoom(isNew);
-    // goToSession(isNew);
   };
 
   return (
@@ -75,6 +82,9 @@ const HeroForm = ({ socket }: any) => {
         variant="outlined"
         onChange={(e) => setUserName(e.target.value)}
       />
+      {showFormError && (
+        <h4 style={{ color: "red", margin: 10 }}>please fill the above form</h4>
+      )}
       <Stack
         spacing={2}
         direction="row"

@@ -5,8 +5,8 @@ interface IUser {
 }
 
 interface IFile {
-  name: string;
-  data: string;
+  filename: string;
+  file: any;
 }
 
 interface IMessage {

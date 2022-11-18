@@ -12,6 +12,8 @@ const {
   addUserToSession,
   addMsg,
   getMsgsBySessionId,
+  addFile,
+  getFilesBySessionId,
 } = require("./utils");
 
 const port = process.env.PORT || 8000;
@@ -67,10 +69,13 @@ io.on("connection", (socket: any) => {
   socket.on("uploadfile", ({ files, sessionId }: any, cb: any) => {
     files.map((f: any) => {
       const { file, filename } = f;
-      writeFile(resolve(__dirname, filename), file, (err: Error) => {
-        cb({ message: err ? "failure" : "success" });
-      });
+      addFile({ filename, file, sessionId });
+      // writeFile(resolve(__dirname, filename), file, (err: Error) => {
+      //   cb({ message: err ? "failure" : "success" });
+      // });
     });
+    const allFiles = getFilesBySessionId(sessionId);
+    io.to(sessionId).emit("newFileAdded", allFiles);
   });
 
   socket.on("sendChatMsg", ({ msg, userName, sessionId }: any, cb: any) => {
@@ -88,6 +93,15 @@ io.on("connection", (socket: any) => {
     try {
       let msgs = getMsgsBySessionId(sessionId) ?? [];
       cb(null, msgs);
+    } catch (err) {
+      cb(err);
+    }
+  });
+
+  socket.on("getInitFiles", ({ sessionId }: any, cb: any) => {
+    try {
+      let files = getFilesBySessionId(sessionId) ?? [];
+      cb(null, files);
     } catch (err) {
       cb(err);
     }

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
@@ -10,8 +10,19 @@ import Typography from "@mui/material/Typography";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import DownloadIcon from "@mui/icons-material/Download";
 
-export const FilesArea = ({ isNew, userName, id, socket }: any) => {
+export const FilesArea = ({ isNew, userName, id: sessionId, socket }: any) => {
   const [files, setFiles] = useState<any>([]);
+  const [filesToDownload, setFilesToDownload] = useState<any>([]);
+
+  useEffect(() => {
+    // get initial files
+    socket.emit("getInitFiles", { sessionId }, (err: Error, files: any) => {
+      if (!err) return setFilesToDownload(files);
+      console.error(err);
+    });
+
+    socket.on("newFileAdded", (f: any) => setFilesToDownload(f));
+  }, [sessionId, socket]);
 
   const formatFiles = (files: any) => {
     return [...files].map((f) => ({ filename: f.name, file: f }));
@@ -21,12 +32,19 @@ export const FilesArea = ({ isNew, userName, id, socket }: any) => {
     const formattedFiles = formatFiles(files);
     socket.emit(
       "uploadfile",
-      { files: formattedFiles, sessionId: id },
+      { files: formattedFiles, sessionId },
       (status: any) => {
         console.log(status);
       }
     );
   }
+
+  const downloadThisFile = (filename: any) => {
+    const { file } = filesToDownload.find((f: any) => f.filename === filename);
+    const blob = new Blob([file]);
+    const url = URL.createObjectURL(blob);
+    window.open(url);
+  };
 
   const handleFilesChange = (files: any) => {
     const f = [...files];
@@ -52,7 +70,7 @@ export const FilesArea = ({ isNew, userName, id, socket }: any) => {
             onChange={(e) => handleFilesChange(e.target.files)}
           />
         </Button>
-        {files && files.length ? (
+        {filesToDownload && filesToDownload.length ? (
           <List
             sx={{
               width: "100%",
@@ -60,20 +78,28 @@ export const FilesArea = ({ isNew, userName, id, socket }: any) => {
               maxHeight: 350,
               bgcolor: "#181818",
               overflowY: "auto",
+              padding: 2,
+              borderRadius: "10px",
+              marginBottom: 5
             }}
           >
-            {files.map((f: any) => (
+            {filesToDownload.map((f: any) => (
               <ListItem
-                key={f.name}
+                key={f.filename}
                 secondaryAction={
-                  <IconButton title="Download" edge="end" aria-label="delete">
+                  <IconButton
+                    title="Download"
+                    edge="end"
+                    aria-label="download"
+                    onClick={() => downloadThisFile(f.filename)}
+                  >
                     <DownloadIcon />
                   </IconButton>
                 }
               >
                 <ListItemText
                   sx={{ overflowWrap: "break-word" }}
-                  primary={f.name}
+                  primary={f.filename}
                 />
               </ListItem>
             ))}

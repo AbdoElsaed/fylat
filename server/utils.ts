@@ -104,6 +104,24 @@ const getMsgsBySessionId = (sessionId: string) => {
   return messages;
 };
 
+const addFile = ({ filename, file, sessionId }: any) => {
+  let { files } = findSessionById(sessionId) as ISession;
+  files = [...(files ?? []), { filename, file }];
+  sessions = sessions.map((s: ISession) => {
+    if (s.sessionId === sessionId) {
+      return { ...s, files };
+    } else {
+      return s;
+    }
+  });
+  return files;
+};
+
+const getFilesBySessionId = (sessionId: string) => {
+  let { files } = findSessionById(sessionId) as ISession;
+  return files;
+};
+
 module.exports = {
   getAllSessions,
   checkSessionExist,
@@ -114,4 +132,6 @@ module.exports = {
   leaveSesion,
   addMsg,
   getMsgsBySessionId,
+  addFile,
+  getFilesBySessionId,
 };

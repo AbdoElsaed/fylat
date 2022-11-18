@@ -34,7 +34,7 @@ export default function index() {
           }}
         >
           <a
-            href="https://github.com/AbdoElsaed/FutureMe"
+            href="https://github.com/AbdoElsaed/"
             rel="noopener noreferrer"
             target="_blank"
           >
