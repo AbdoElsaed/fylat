@@ -38,10 +38,32 @@ const isSessionAdmin = ({
 }: IsSessionAdminParams) => {
   let { users } = findSessionById(sessionId) as { users: IUser[] };
   return users.find(
-    (u: IUser) => u.socketId === socketId && u.userName === userName
+    (u: IUser) =>
+      u.socketId === socketId && u.userName === userName && u.type === "admin"
   )
     ? true
     : false;
+};
+
+const getRoleType = ({
+  sessionId,
+  socketId,
+  userName,
+}: IsSessionAdminParams) => {
+  try {
+    const roles = ["admin", "member"];
+    let { users } = findSessionById(sessionId) as { users: IUser[] };
+    const user = users.find(
+      (u: IUser) => u.socketId === socketId && u.userName === userName
+    );
+    console.log({ user });
+    if (!user) {
+      throw new Error("user not found");
+    }
+    return roles.includes(user?.type as string) ? user?.type : null;
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 const removeSession = (
@@ -134,4 +156,5 @@ module.exports = {
   getMsgsBySessionId,
   addFile,
   getFilesBySessionId,
+  getRoleType,
 };

@@ -5,10 +5,10 @@ import { SessionHeader } from "./SessionHeader";
 import { FilesArea } from "./FilesArea";
 import { Chat } from "./Chat";
 
-export const Sessions = ({ isNew, userName, id, socket }: any) => {
+export const Sessions = ({ role, isNew, userName, id, socket }: any) => {
   return (
     <Box sx={{ flexGrow: 1, mt: 10 }}>
-      <SessionHeader id={id} />
+      <SessionHeader id={id} role={role} />
       <Grid sx={{ mt: 10 }} container spacing={2} justifyContent="space-around">
         <Grid item>
           <FilesArea

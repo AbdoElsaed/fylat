@@ -42,6 +42,7 @@ export const Chat = ({ isNew, userName, id: sessionId, socket }: any) => {
   }, [socket, sessionId]);
 
   const onCLick = () => {
+    if (!msg.trim()) return;
     socket.emit(
       "sendChatMsg",
       { msg, userName, sessionId },
@@ -103,13 +104,18 @@ export const Chat = ({ isNew, userName, id: sessionId, socket }: any) => {
           <TextField
             sx={{ width: "100%" }}
             id="msg"
-            placeholder="send msg..."
+            placeholder="send a messsag.."
             variant="standard"
             value={msg}
             onChange={(e) => setMsg(e.target.value)}
             onKeyPress={(e) => e.key === "Enter" && onCLick()}
           />
-          <IconButton onClick={onCLick} color="primary" aria-label="delete">
+          <IconButton
+            onClick={onCLick}
+            color="primary"
+            aria-label="delete"
+            disabled={!msg.trim()}
+          >
             <SendIcon />
           </IconButton>
         </Stack>

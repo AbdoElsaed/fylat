@@ -14,6 +14,8 @@ const {
   getMsgsBySessionId,
   addFile,
   getFilesBySessionId,
+  isSessionAdmin,
+  getRoleType,
 } = require("./utils");
 
 const port = process.env.PORT || 8000;
@@ -103,6 +105,21 @@ io.on("connection", (socket: any) => {
       let files = getFilesBySessionId(sessionId) ?? [];
       cb(null, files);
     } catch (err) {
+      cb(err);
+    }
+  });
+
+  socket.on("getRoleType", ({ sessionId, userName }: any, cb: any) => {
+    try {
+      console.log({ sessionId, userName, socketId: socket.id });
+      const roleType = getRoleType({
+        sessionId,
+        userName,
+        socketId: socket.id,
+      });
+      cb(null, roleType);
+    } catch (err) {
+      console.log(err);
       cb(err);
     }
   });

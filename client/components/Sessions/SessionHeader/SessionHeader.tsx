@@ -8,12 +8,12 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import ShareIcon from "@mui/icons-material/Share";
 import LogoutIcon from "@mui/icons-material/Logout";
 
-export const SessionHeader = ({ id }: any) => {
+export const SessionHeader = ({ id, role }: any) => {
   return (
     <Box sx={{ flexGrow: 1, mt: 5, mb: 3 }}>
       <Grid container justifyContent="space-around">
         <Grid item>
-          <Typography variant="h5">Session : {id}</Typography>
+          <Typography variant="h5">Session ID : {id}</Typography>
           <Typography sx={{ color: "#666", fontSize: "14px" }} component="p">
             (session will be removed automatically when everyone leaves)
           </Typography>
@@ -27,13 +27,15 @@ export const SessionHeader = ({ id }: any) => {
             >
               <ShareIcon />
             </IconButton>
-            <IconButton
-              color="secondary"
-              title="Remove Session"
-              aria-label="remove session"
-            >
-              <DeleteIcon />
-            </IconButton>
+            {role === "admin" ? (
+              <IconButton
+                color="secondary"
+                title="Remove Session"
+                aria-label="remove session"
+              >
+                <DeleteIcon />
+              </IconButton>
+            ) : null}
             <IconButton title="Leave Session" aria-label="Leave Session">
               <LogoutIcon />
             </IconButton>

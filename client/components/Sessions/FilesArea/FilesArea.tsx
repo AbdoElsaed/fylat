@@ -61,7 +61,7 @@ export const FilesArea = ({ isNew, userName, id: sessionId, socket }: any) => {
           component="label"
           startIcon={<AttachFileIcon />}
         >
-          Share File
+          Share Files
           <input
             name="files"
             type="file"
@@ -74,13 +74,10 @@ export const FilesArea = ({ isNew, userName, id: sessionId, socket }: any) => {
           <List
             sx={{
               width: "100%",
-              maxWidth: 400,
-              maxHeight: 350,
-              bgcolor: "#181818",
+              maxWidth: 500,
+              maxHeight: 400,
               overflowY: "auto",
-              padding: 2,
-              borderRadius: "10px",
-              marginBottom: 5
+              marginBottom: 5,
             }}
           >
             {filesToDownload.map((f: any) => (
@@ -105,7 +102,7 @@ export const FilesArea = ({ isNew, userName, id: sessionId, socket }: any) => {
             ))}
           </List>
         ) : (
-          <Typography component="div">No files !!</Typography>
+          <Typography component="div">No files yet.</Typography>
         )}
       </Grid>
     </Box>
