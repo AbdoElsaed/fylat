@@ -5,9 +5,13 @@ import TextField from "@mui/material/TextField";
 import LoadingButton from "@mui/lab/LoadingButton";
 import AddCircle from "@mui/icons-material/AddCircle";
 import ArrowCircleDown from "@mui/icons-material/ArrowCircleDown";
+import Button from "@mui/material/Button";
 import { useRouter } from "next/router";
+import { useSnackbar } from "notistack";
 
 const HeroForm = ({ socket }: any) => {
+  const { enqueueSnackbar } = useSnackbar();
+
   socket.on("newUserJoined", ({ userName }: any) => {
     console.log(`${userName} joined the session`);
   });
@@ -16,9 +20,10 @@ const HeroForm = ({ socket }: any) => {
   const [joinBtnLoading, setJoinBtnLoading] = useState<boolean>(false);
   const [id, setId] = useState<string>("");
   const [userName, setUserName] = useState<string>("");
-  const [showFormError, setShowFormError] = useState<boolean>(false);
 
   const router = useRouter();
+
+  const generateId = () => setId(Math.random().toString(36).slice(2));
 
   const goToSession = (isNew: boolean, err: string) => {
     if (err) {
@@ -44,11 +49,7 @@ const HeroForm = ({ socket }: any) => {
 
   const handleClick = (isNew: boolean) => {
     if (!id.trim() || !userName.trim()) {
-      setShowFormError(true);
-      setTimeout(() => {
-        setShowFormError(false);
-      }, 2000);
-      return;
+      return enqueueSnackbar("Please fill the form!", { variant: "error" });
     }
     isNew ? setStartBtnLoading(true) : setJoinBtnLoading(true);
     joinRoom(isNew);
@@ -68,23 +69,35 @@ const HeroForm = ({ socket }: any) => {
       alignItems="center"
       alignContent="center"
     >
-      <TextField
-        className={styles.textInput}
-        id="sessionId"
-        label="Session ID"
-        variant="outlined"
-        onChange={(e) => setId(e.target.value)}
-      />
-      <TextField
-        className={styles.textInput}
-        id="username"
-        label="User Name"
-        variant="outlined"
-        onChange={(e) => setUserName(e.target.value)}
-      />
-      {showFormError && (
-        <h4 style={{ color: "red", margin: 10 }}>please fill the above form</h4>
-      )}
+      <div style={{ display: "flex", flexDirection: "row", width: "85%" }}>
+        <TextField
+          className={styles.textInput}
+          id="sessionId"
+          label="Session ID"
+          variant="outlined"
+          required
+          value={id}
+          onChange={(e) => setId(e.target.value)}
+        />
+        <Button
+          onClick={generateId}
+          size="small"
+          style={{ textTransform: "none" }}
+        >
+          Random
+        </Button>
+      </div>
+      <div style={{ width: "85%" }}>
+        <TextField
+          className={styles.textInput}
+          id="username"
+          label="User Name"
+          variant="outlined"
+          required
+          value={userName}
+          onChange={(e) => setUserName(e.target.value)}
+        />
+      </div>
       <Stack
         spacing={2}
         direction="row"

@@ -3,7 +3,6 @@ import Link from "next/link";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import GitHubIcon from "@mui/icons-material/GitHub";
-import CoffeeIcon from "@mui/icons-material/Coffee";
 
 export default function index() {
   return (
@@ -45,8 +44,14 @@ export default function index() {
             target="_blank"
             rel="noreferrer"
             title="Buy me a coffee"
+            style={{ marginLeft: 5 }}
           >
-            <CoffeeIcon sx={{ fontSize: "40px", color: "#888" }} />
+            <Image
+              src="/images/bmclogo.png"
+              alt="Logo Image"
+              width={30}
+              height={30}
+            />
           </a>
         </Grid>
       </Grid>
