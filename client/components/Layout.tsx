@@ -21,7 +21,13 @@ const Layout = ({ children }: any) => {
   return (
     <>
       <Meta />
-      <SnackbarProvider maxSnack={3}>
+      <SnackbarProvider
+        maxSnack={3}
+        autoHideDuration={4000}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        preventDuplicate={true}
+        dense={true}
+      >
         <ThemeProvider theme={theme}>
           <CssBaseline />
           <Header />
