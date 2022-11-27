@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styles from "@/styles/Hero.module.css";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
@@ -7,21 +7,27 @@ import AddCircle from "@mui/icons-material/AddCircle";
 import ArrowCircleDown from "@mui/icons-material/ArrowCircleDown";
 import Button from "@mui/material/Button";
 import { useRouter } from "next/router";
+import { useDeviceDetect } from "@/utils/hooks";
 import { useSnackbar } from "notistack";
 
 const HeroForm = ({ socket }: any) => {
   const { enqueueSnackbar } = useSnackbar();
+  const isMobile = useDeviceDetect();
 
   socket.on("newUserJoined", ({ userName }: any) => {
     console.log(`${userName} joined the session`);
   });
+  const router = useRouter();
+  const { invitedSessionId } = router.query;
 
   const [startBtnLoading, setStartBtnLoading] = useState<boolean>(false);
   const [joinBtnLoading, setJoinBtnLoading] = useState<boolean>(false);
   const [id, setId] = useState<string>("");
   const [userName, setUserName] = useState<string>("");
 
-  const router = useRouter();
+  useEffect(() => {
+    setId((invitedSessionId as string) ?? "");
+  }, [invitedSessionId]);
 
   const generateId = () => setId(Math.random().toString(36).slice(2));
 
@@ -29,7 +35,7 @@ const HeroForm = ({ socket }: any) => {
     if (err) {
       isNew ? setStartBtnLoading(false) : setJoinBtnLoading(false);
       console.error(err);
-      alert(err);
+      enqueueSnackbar(err, { variant: "error" });
     } else {
       router.push(`/session/${id}?userName=${userName}&isNew=${isNew}`);
     }
@@ -76,13 +82,15 @@ const HeroForm = ({ socket }: any) => {
           label="Session ID"
           variant="outlined"
           required
-          value={id}
+          value={invitedSessionId ? invitedSessionId : id}
           onChange={(e) => setId(e.target.value)}
+          disabled={!!invitedSessionId}
         />
         <Button
           onClick={generateId}
           size="small"
           style={{ textTransform: "none" }}
+          disabled={!!invitedSessionId}
         >
           Random
         </Button>
@@ -112,8 +120,9 @@ const HeroForm = ({ socket }: any) => {
           loadingPosition="end"
           endIcon={<AddCircle />}
           loading={startBtnLoading}
+          disabled={!!invitedSessionId}
         >
-          Start a new session
+          {isMobile ? "Start" : "Start a new session"}
         </LoadingButton>
         <p>OR</p>
         <LoadingButton
@@ -124,7 +133,7 @@ const HeroForm = ({ socket }: any) => {
           endIcon={<ArrowCircleDown />}
           loading={joinBtnLoading}
         >
-          Join an exist session
+          {isMobile ? "Join" : "Join an exist session"}
         </LoadingButton>
       </Stack>
     </Stack>

@@ -8,7 +8,7 @@ import { Chat } from "./Chat";
 export const Sessions = ({ role, isNew, userName, id, socket }: any) => {
   return (
     <Box sx={{ flexGrow: 1, mt: 10 }}>
-      <SessionHeader id={id} role={role} />
+      <SessionHeader id={id} role={role} socket={socket} userName={userName} />
       <Grid sx={{ mt: 10 }} container spacing={2} justifyContent="space-around">
         <Grid item>
           <FilesArea

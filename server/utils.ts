@@ -4,6 +4,11 @@ const findSessionById = (sessionId: string) => {
   return sessions.find((s: ISession) => s.sessionId === sessionId);
 };
 
+const findUser = ({ sessionId, userName }: any) => {
+  let session: ISession = findSessionById(sessionId) ?? {};
+  return session?.users?.find((u: IUser) => u.userName === userName);
+};
+
 const checkSessionExist = (sessionId: string) => {
   return sessions.filter((s: any) => s.sessionId === sessionId).length
     ? true
@@ -20,8 +25,8 @@ const createNewSession = ({ sessionId, user }: NewSessionParams) => {
 };
 
 const addUserToSession = ({ sessionId, user }: NewSessionParams) => {
-  const newSession = findSessionById(sessionId) as ISession;
-  newSession.users?.push(user);
+  const newSession = (findSessionById(sessionId) ?? {}) as ISession;
+  newSession?.users?.push(user);
 
   sessions = sessions.map((s: ISession) => {
     if (s.sessionId === sessionId) {
@@ -36,8 +41,8 @@ const isSessionAdmin = ({
   socketId,
   userName,
 }: IsSessionAdminParams) => {
-  let { users } = findSessionById(sessionId) as { users: IUser[] };
-  return users.find(
+  let { users } = (findSessionById(sessionId) ?? {}) as ISession;
+  return users?.find(
     (u: IUser) =>
       u.socketId === socketId && u.userName === userName && u.type === "admin"
   )
@@ -50,65 +55,52 @@ const getRoleType = ({
   socketId,
   userName,
 }: IsSessionAdminParams) => {
-  try {
-    const roles = ["admin", "member"];
-    let { users } = findSessionById(sessionId) as { users: IUser[] };
-    const user = users.find(
-      (u: IUser) => u.socketId === socketId && u.userName === userName
-    );
-    console.log({ user });
-    if (!user) {
-      throw new Error("user not found");
-    }
-    return roles.includes(user?.type as string) ? user?.type : null;
-  } catch (err) {
-    console.log(err);
+  const roles = ["admin", "member"];
+  let { users } = (findSessionById(sessionId) ?? {}) as ISession;
+  const user = users?.find(
+    (u: IUser) => u.socketId === socketId && u.userName === userName
+  );
+  if (!user) {
+    throw new Error("user not found");
   }
+  return roles.includes(user?.type as string) ? user?.type : null;
 };
 
-const removeSession = (
-  { sessionId, socketId, userName }: RemoveSessionParams,
-  cb: any
-) => {
-  try {
-    if (!isSessionAdmin({ sessionId, socketId, userName })) {
-      throw new Error("not an admin user!!");
-    }
-    sessions = sessions.filter((s: ISession) => s.sessionId !== sessionId);
-    return sessions;
-  } catch (err) {
-    console.log(err);
-    cb(err);
+const removeSession = ({
+  sessionId,
+  socketId,
+  userName,
+}: RemoveSessionParams) => {
+  if (!isSessionAdmin({ sessionId, socketId, userName })) {
+    throw new Error("not an admin user!!");
   }
+  sessions = sessions.filter((s: ISession) => s.sessionId !== sessionId);
+  return sessions;
 };
 
-const leaveSesion = (
-  { sessionId, socketId, userName }: RemoveSessionParams,
-  cb: any
-) => {
-  try {
-    if (isSessionAdmin({ sessionId, socketId, userName })) {
-      return removeSession({ sessionId, socketId, userName }, () => {});
-    }
-    sessions = sessions.map((s: ISession) => {
-      if (s.sessionId === sessionId) {
-        let users = s.users?.filter((u: IUser) => u.userName !== userName);
-        return {
-          ...s,
-          users,
-        };
-      }
-      return s;
-    });
-  } catch (err) {
-    console.log(err);
-    cb(err);
+const leaveSesion = ({
+  sessionId,
+  socketId,
+  userName,
+}: RemoveSessionParams) => {
+  if (isSessionAdmin({ sessionId, socketId, userName })) {
+    return removeSession({ sessionId, socketId, userName });
   }
+  sessions = sessions.map((s: ISession) => {
+    if (s.sessionId === sessionId) {
+      let users = s.users?.filter((u: IUser) => u.userName !== userName);
+      return {
+        ...s,
+        users,
+      };
+    }
+    return s;
+  });
 };
 
 const getAllSessions = () => sessions;
 
-const addMsg = ({ text, sender, sessionId }: AddMsgToSession) => {
+const addMsg = ({ text, sender, sessionId }: AddMsgToSessionParams) => {
   let { messages } = findSessionById(sessionId) as ISession;
   messages = [...(messages ?? []), { text, sender }];
   sessions = sessions.map((s: ISession) => {
@@ -127,7 +119,7 @@ const getMsgsBySessionId = (sessionId: string) => {
 };
 
 const addFile = ({ filename, file, sessionId }: any) => {
-  let { files } = findSessionById(sessionId) as ISession;
+  let { files } = (findSessionById(sessionId) ?? {}) as ISession;
   files = [...(files ?? []), { filename, file }];
   sessions = sessions.map((s: ISession) => {
     if (s.sessionId === sessionId) {
@@ -157,4 +149,6 @@ module.exports = {
   addFile,
   getFilesBySessionId,
   getRoleType,
+  findSessionById,
+  findUser,
 };

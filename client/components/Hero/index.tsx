@@ -9,7 +9,6 @@ import HeroForm from "./HeroForm";
 
 const Hero = ({ socket }: any) => {
   const isMobile = useDeviceDetect();
-  console.log({ isMobile });
   return (
     <Box className={styles.container}>
       <Grid container justifyContent="space-around">

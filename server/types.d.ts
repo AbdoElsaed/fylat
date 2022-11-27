@@ -35,4 +35,4 @@ type RemoveSessionParams = {
   userName: string;
 };
 
-type AddMsgToSession = { text: string; sender: string; sessionId: string };
+type AddMsgToSessionParams = { text: string; sender: string; sessionId: string };

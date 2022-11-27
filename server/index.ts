@@ -1,10 +1,12 @@
 import express, { Express, Request, Response } from "express";
+const util = require("util");
 const app: Express = express();
 const http = require("http");
 const server = http.createServer(app);
 const { writeFile } = require("fs");
 const { Server } = require("socket.io");
 const { resolve } = require("path");
+const fs = require("node:fs");
 const {
   getAllSessions,
   checkSessionExist,
@@ -14,8 +16,11 @@ const {
   getMsgsBySessionId,
   addFile,
   getFilesBySessionId,
-  isSessionAdmin,
   getRoleType,
+  removeSession,
+  leaveSesion,
+  findSessionById,
+  findUser,
 } = require("./utils");
 
 const port = process.env.PORT || 8000;
@@ -69,15 +74,20 @@ io.on("connection", (socket: any) => {
   });
 
   socket.on("uploadfile", ({ files, sessionId }: any, cb: any) => {
-    files.map((f: any) => {
-      const { file, filename } = f;
-      addFile({ filename, file, sessionId });
-      // writeFile(resolve(__dirname, filename), file, (err: Error) => {
-      //   cb({ message: err ? "failure" : "success" });
-      // });
-    });
-    const allFiles = getFilesBySessionId(sessionId);
-    io.to(sessionId).emit("newFileAdded", allFiles);
+    try {
+      files.map((f: any) => {
+        const { file, filename } = f;
+        addFile({ filename, file, sessionId });
+        // writeFile(resolve(__dirname, filename), file, (err: Error) => {
+        //   cb({ message: err ? "failure" : "success" });
+        // });
+      });
+      const allFiles = getFilesBySessionId(sessionId);
+      io.to(sessionId).emit("newFileAdded", allFiles);
+    } catch (err: any) {
+      console.error(err.message);
+      cb(err.message);
+    }
   });
 
   socket.on("sendChatMsg", ({ msg, userName, sessionId }: any, cb: any) => {
@@ -85,9 +95,9 @@ io.on("connection", (socket: any) => {
       let msgs = addMsg({ text: msg, sender: userName, sessionId });
       cb(null, msgs);
       io.to(sessionId).emit("newMsgAdded", msgs);
-    } catch (err) {
-      console.error(err);
-      cb(err);
+    } catch (err: any) {
+      console.error(err.message);
+      cb(err.message);
     }
   });
 
@@ -95,8 +105,9 @@ io.on("connection", (socket: any) => {
     try {
       let msgs = getMsgsBySessionId(sessionId) ?? [];
       cb(null, msgs);
-    } catch (err) {
-      cb(err);
+    } catch (err: any) {
+      console.error(err.message);
+      cb(err.message);
     }
   });
 
@@ -104,23 +115,67 @@ io.on("connection", (socket: any) => {
     try {
       let files = getFilesBySessionId(sessionId) ?? [];
       cb(null, files);
-    } catch (err) {
-      cb(err);
+    } catch (err: any) {
+      console.error(err.message);
+      cb(err.message);
     }
   });
 
   socket.on("getRoleType", ({ sessionId, userName }: any, cb: any) => {
     try {
-      console.log({ sessionId, userName, socketId: socket.id });
       const roleType = getRoleType({
         sessionId,
         userName,
         socketId: socket.id,
       });
       cb(null, roleType);
-    } catch (err) {
-      console.log(err);
-      cb(err);
+    } catch (err: any) {
+      console.error(err.message);
+      cb(err.message);
+    }
+  });
+
+  socket.on("removeSession", async ({ sessionId, userName }: any, cb: any) => {
+    try {
+      await new Promise((resolve) =>
+        resolve(
+          removeSession({
+            sessionId,
+            userName,
+            socketId: socket.id,
+          })
+        )
+      );
+
+      if (!findSessionById(sessionId)) {
+        socket.to(sessionId).emit("sessionIsClosed", { sessionId, userName });
+      }
+      cb(null);
+    } catch (err: any) {
+      console.error(err.message);
+      cb(err.message);
+    }
+  });
+
+  socket.on("leaveSession", async ({ sessionId, userName }: any, cb: any) => {
+    console.log("zzzzzzzzzzzzz");
+    try {
+      await new Promise((resolve) =>
+        resolve(
+          leaveSesion({
+            sessionId,
+            userName,
+            socketId: socket.id,
+          })
+        )
+      );
+      if (!findUser({ sessionId, userName })) {
+        socket.to(sessionId).emit("userLeft", { sessionId, userName });
+      }
+      cb(null);
+    } catch (err: any) {
+      console.error(err.message);
+      cb(err.message);
     }
   });
 });
