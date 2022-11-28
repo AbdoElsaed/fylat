@@ -1,21 +1,21 @@
 let sessions: ISession[] = [];
 
-const findSessionById = (sessionId: string) => {
+export const findSessionById = (sessionId: string) => {
   return sessions.find((s: ISession) => s.sessionId === sessionId);
 };
 
-const findUser = ({ sessionId, userName }: any) => {
+export const findUser = ({ sessionId, userName }: any) => {
   let session: ISession = findSessionById(sessionId) ?? {};
   return session?.users?.find((u: IUser) => u.userName === userName);
 };
 
-const checkSessionExist = (sessionId: string) => {
+export const checkSessionExist = (sessionId: string) => {
   return sessions.filter((s: any) => s.sessionId === sessionId).length
     ? true
     : false;
 };
 
-const expireSession = (
+export const expireSession = (
   sessionId: string,
   expirytTime: number = 7200000,
   cb: (err: any, status: "success" | "failure") => void
@@ -37,7 +37,7 @@ const expireSession = (
   );
 };
 
-const createNewSession = ({ sessionId, user }: NewSessionParams) => {
+export const createNewSession = ({ sessionId, user }: NewSessionParams) => {
   let session: ISession = {
     sessionId,
     users: [user],
@@ -46,7 +46,7 @@ const createNewSession = ({ sessionId, user }: NewSessionParams) => {
   return session;
 };
 
-const addUserToSession = ({ sessionId, user }: NewSessionParams) => {
+export const addUserToSession = ({ sessionId, user }: NewSessionParams) => {
   const newSession = (findSessionById(sessionId) ?? {}) as ISession;
   newSession?.users?.push(user);
 
@@ -58,7 +58,7 @@ const addUserToSession = ({ sessionId, user }: NewSessionParams) => {
   });
 };
 
-const isSessionAdmin = ({
+export const isSessionAdmin = ({
   sessionId,
   socketId,
   userName,
@@ -72,7 +72,7 @@ const isSessionAdmin = ({
     : false;
 };
 
-const getRoleType = ({
+export const getRoleType = ({
   sessionId,
   socketId,
   userName,
@@ -88,7 +88,7 @@ const getRoleType = ({
   return roles.includes(user?.type as string) ? user?.type : null;
 };
 
-const removeSession = ({
+export const removeSession = ({
   sessionId,
   socketId,
   userName,
@@ -100,7 +100,7 @@ const removeSession = ({
   return sessions;
 };
 
-const leaveSesion = ({
+export const leaveSesion = ({
   sessionId,
   socketId,
   userName,
@@ -120,9 +120,9 @@ const leaveSesion = ({
   });
 };
 
-const getAllSessions = () => sessions;
+export const getAllSessions = () => sessions;
 
-const addMsg = ({ text, sender, sessionId }: AddMsgToSessionParams) => {
+export const addMsg = ({ text, sender, sessionId }: AddMsgToSessionParams) => {
   let { messages } = findSessionById(sessionId) as ISession;
   messages = [...(messages ?? []), { text, sender }];
   sessions = sessions.map((s: ISession) => {
@@ -135,12 +135,12 @@ const addMsg = ({ text, sender, sessionId }: AddMsgToSessionParams) => {
   return messages;
 };
 
-const getMsgsBySessionId = (sessionId: string) => {
+export const getMsgsBySessionId = (sessionId: string) => {
   let { messages } = findSessionById(sessionId) as ISession;
   return messages;
 };
 
-const addFile = ({ filename, file, sessionId }: any) => {
+export const addFile = ({ filename, file, sessionId }: any) => {
   let { files } = (findSessionById(sessionId) ?? {}) as ISession;
   files = [...(files ?? []), { filename, file }];
   sessions = sessions.map((s: ISession) => {
@@ -153,25 +153,7 @@ const addFile = ({ filename, file, sessionId }: any) => {
   return files;
 };
 
-const getFilesBySessionId = (sessionId: string) => {
+export const getFilesBySessionId = (sessionId: string) => {
   let { files } = findSessionById(sessionId) as ISession;
   return files;
-};
-
-module.exports = {
-  getAllSessions,
-  checkSessionExist,
-  createNewSession,
-  addUserToSession,
-  isSessionAdmin,
-  removeSession,
-  leaveSesion,
-  addMsg,
-  getMsgsBySessionId,
-  addFile,
-  getFilesBySessionId,
-  getRoleType,
-  findSessionById,
-  findUser,
-  expireSession,
 };

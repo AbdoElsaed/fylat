@@ -1,13 +1,8 @@
 import express, { Express, Request, Response } from "express";
-const util = require("util");
-const app: Express = express();
-const http = require("http");
-const server = http.createServer(app);
-const { writeFile } = require("fs");
-const { Server } = require("socket.io");
-const { resolve } = require("path");
-const fs = require("node:fs");
-const {
+import util from "util";
+import http from "http";
+import { Server } from "socket.io";
+import {
   getAllSessions,
   checkSessionExist,
   createNewSession,
@@ -22,7 +17,10 @@ const {
   findSessionById,
   findUser,
   expireSession,
-} = require("./utils");
+} from "./utils";
+
+const app: Express = express();
+const server = http.createServer(app);
 
 const port = process.env.PORT || 8000;
 
@@ -88,9 +86,6 @@ io.on("connection", (socket: any) => {
       files.map((f: any) => {
         const { file, filename } = f;
         addFile({ filename, file, sessionId });
-        // writeFile(resolve(__dirname, filename), file, (err: Error) => {
-        //   cb({ message: err ? "failure" : "success" });
-        // });
       });
       const allFiles = getFilesBySessionId(sessionId);
       io.to(sessionId).emit("newFileAdded", allFiles);
