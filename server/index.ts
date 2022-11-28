@@ -1,5 +1,5 @@
 import express, { Express, Request, Response } from "express";
-import http from "http";
+import https from "https";
 import { Server } from "socket.io";
 import {
   getAllSessions,
@@ -19,14 +19,18 @@ import {
 } from "./utils";
 
 const app: Express = express();
-const server = http.createServer(app);
+const server = https.createServer(app);
+
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config();
+}
 
 const port = process.env.PORT || 8000;
 
 const io = new Server(server, {
   maxHttpBufferSize: 1e8, // 100 MB
   cors: {
-    origin: "http://localhost:3000",
+    origin: process.env.CLIENT_URL,
     methods: ["GET", "POST"],
   },
 });
@@ -134,6 +138,9 @@ io.on("connection", (socket: any) => {
       });
       cb(null, roleType);
     } catch (err: any) {
+      if (process.env.NODE_ENV !== "production") {
+        require("dotenv").config();
+      }
       console.error(err.message);
       cb(err.message);
     }
@@ -184,5 +191,5 @@ io.on("connection", (socket: any) => {
 });
 
 server.listen(port, () => {
-  console.log(`listening on http://localhost:${port}`);
+  console.log(`server is listening on port ${port}`);
 });
