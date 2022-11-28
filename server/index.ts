@@ -21,6 +21,7 @@ const {
   leaveSesion,
   findSessionById,
   findUser,
+  expireSession,
 } = require("./utils");
 
 const port = process.env.PORT || 8000;
@@ -46,6 +47,15 @@ const joinSession = ({ sessionId, userName, isNew, socket }: any) => {
       sessionId,
       user: { userName, type: "admin", socketId: socket.id },
     });
+    expireSession(
+      sessionId,
+      7200000,
+      (err: any, status: "success" | "failure") => {
+        if (status === "success") {
+          io.to(sessionId).emit("sessionIsExpired", { sessionId });
+        }
+      }
+    );
   }
   if (!isNew && sessionExist) {
     addUserToSession({
@@ -56,7 +66,7 @@ const joinSession = ({ sessionId, userName, isNew, socket }: any) => {
   // join a session
   socket.join(sessionId);
 
-  if (!isNew) io.to(sessionId).emit("newUserJoined", { userName });
+  if (!isNew) io.to(sessionId).emit("newUserJoined", { userName, sessionId });
 };
 
 io.on("connection", (socket: any) => {
@@ -158,7 +168,6 @@ io.on("connection", (socket: any) => {
   });
 
   socket.on("leaveSession", async ({ sessionId, userName }: any, cb: any) => {
-    console.log("zzzzzzzzzzzzz");
     try {
       await new Promise((resolve) =>
         resolve(

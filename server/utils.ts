@@ -15,6 +15,28 @@ const checkSessionExist = (sessionId: string) => {
     : false;
 };
 
+const expireSession = (
+  sessionId: string,
+  expirytTime: number = 7200000,
+  cb: (err: any, status: "success" | "failure") => void
+) => {
+  setTimeout(
+    (id) => {
+      console.log(sessionId, "session is expired after", expirytTime);
+      sessions = sessions.filter((s: ISession) => s.sessionId !== id);
+      const isExpired = !findSessionById(id);
+      console.log({ isExpired });
+      if (isExpired) {
+        cb(null, "success");
+      } else {
+        cb("session isn't expired", "failure");
+      }
+    },
+    expirytTime,
+    sessionId
+  );
+};
+
 const createNewSession = ({ sessionId, user }: NewSessionParams) => {
   let session: ISession = {
     sessionId,
@@ -72,7 +94,7 @@ const removeSession = ({
   userName,
 }: RemoveSessionParams) => {
   if (!isSessionAdmin({ sessionId, socketId, userName })) {
-    throw new Error("not an admin user!!");
+    throw new Error("not a session admin!!");
   }
   sessions = sessions.filter((s: ISession) => s.sessionId !== sessionId);
   return sessions;
@@ -151,4 +173,5 @@ module.exports = {
   getRoleType,
   findSessionById,
   findUser,
+  expireSession,
 };

@@ -38,7 +38,7 @@ export const SessionHeader = ({ id, role, socket, userName }: any) => {
         console.error(err);
         return enqueueSnackbar(err, { variant: "error" });
       }
-      enqueueSnackbar(`Session ${id} closed successfully`, {
+      enqueueSnackbar(`You left session : ${id}`, {
         variant: "success",
       });
     });
@@ -56,14 +56,17 @@ export const SessionHeader = ({ id, role, socket, userName }: any) => {
   };
 
   return (
-    <Box sx={{ flexGrow: 1, mt: 5, mb: 3 }}>
+    <Box sx={{ flexGrow: 1, mt: 5, mb: 3, p: 1 }}>
       <Grid container justifyContent="space-around">
         <Grid item>
           <Typography variant="h5">Session ID : {id}</Typography>
-          <Typography sx={{ color: "#666", fontSize: "14px" }} component="p">
+          <Typography sx={{ color: "#777", fontSize: "14px" }} component="p">
+            (session will expire automaticaly after 2 hours).
+          </Typography>
+          <Typography sx={{ color: "#777", fontSize: "14px" }} component="p">
             {role === "admin"
-              ? "(As session admin, session will be closed when you leave)"
-              : "(After leaving, rejoin is required)"}
+              ? "(As session admin, session will be permanently removed when you leave)."
+              : null}
           </Typography>
         </Grid>
         <Grid item>

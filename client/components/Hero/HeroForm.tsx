@@ -13,10 +13,6 @@ import { useSnackbar } from "notistack";
 const HeroForm = ({ socket }: any) => {
   const { enqueueSnackbar } = useSnackbar();
   const isMobile = useDeviceDetect();
-
-  socket.on("newUserJoined", ({ userName }: any) => {
-    console.log(`${userName} joined the session`);
-  });
   const router = useRouter();
   const { invitedSessionId } = router.query;
 

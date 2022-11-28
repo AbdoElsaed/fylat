@@ -35,14 +35,35 @@ const SessionsPage = ({ socket }: any) => {
           query: { onClosedSession: sessionId },
         });
         enqueueSnackbar(`this session has been closed by admin ${admin}`, {
-          variant: "success",
+          variant: "info",
+        });
+      }
+    });
+
+    socket.on("sessionIsExpired", ({ sessionId }: any) => {
+      console.log(sessionId, "session is expired");
+      if (sessionId === id) {
+        router.push({
+          pathname: "/",
+          query: { onClosedSession: sessionId },
+        });
+        enqueueSnackbar(`session '${sessionId}' has been expired`, {
+          variant: "info",
         });
       }
     });
 
     socket.on("userLeft", ({ sessionId, userName: userLeft }: any) => {
       if (sessionId === id) {
-        enqueueSnackbar(`${userLeft} just left the session!`, {
+        enqueueSnackbar(`${userLeft} left the session!`, {
+          variant: "info",
+        });
+      }
+    });
+
+    socket.on("newUserJoined", ({ userName, sessionId }: any) => {
+      if (sessionId === id) {
+        enqueueSnackbar(`${userName} joined the session!`, {
           variant: "info",
         });
       }
