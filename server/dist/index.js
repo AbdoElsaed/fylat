@@ -13,11 +13,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const https_1 = __importDefault(require("https"));
+const http_1 = __importDefault(require("http"));
 const socket_io_1 = require("socket.io");
 const utils_1 = require("./utils");
 const app = (0, express_1.default)();
-const server = https_1.default.createServer(app);
+const server = http_1.default.createServer(app);
 if (process.env.NODE_ENV !== "production") {
     require("dotenv").config();
 }
@@ -173,3 +173,4 @@ io.on("connection", (socket) => {
 server.listen(port, () => {
     console.log(`server is listening on port ${port}`);
 });
+//# sourceMappingURL=index.js.map

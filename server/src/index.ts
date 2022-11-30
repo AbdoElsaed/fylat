@@ -1,5 +1,5 @@
 import express, { Express, Request, Response } from "express";
-import https from "https";
+import http from "http";
 import { Server } from "socket.io";
 import {
   getAllSessions,
@@ -19,7 +19,7 @@ import {
 } from "./utils";
 
 const app: Express = express();
-const server = https.createServer(app);
+const server = http.createServer(app);
 
 if (process.env.NODE_ENV !== "production") {
   require("dotenv").config();
