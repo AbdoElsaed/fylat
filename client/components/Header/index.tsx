@@ -33,7 +33,7 @@ export default function index() {
           }}
         >
           <a
-            href="https://github.com/AbdoElsaed/"
+            href="https://github.com/AbdoElsaed/fylat"
             rel="noopener noreferrer"
             target="_blank"
           >
