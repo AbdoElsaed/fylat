@@ -12,7 +12,7 @@ const Hero = ({ socket }: any) => {
   return (
     <Box className={styles.container}>
       <Grid container justifyContent="space-around">
-        <Grid item mt={10}>
+        <Grid item mt={10} md={6}>
           <Typography variant="h3" className={styles.headline}>
             Sharing is caring
           </Typography>
@@ -21,13 +21,15 @@ const Hero = ({ socket }: any) => {
           </Typography>
           <HeroForm socket={socket} />
         </Grid>
-        <Grid item>
-          <Image
-            src="/images/bg.png"
-            alt="Logo Image"
-            width={isMobile ? 400 : 600}
-            height={isMobile ? 400 : 600}
-          />
+        <Grid item md={6} style={{ margin: 0, padding: 0, maxWidth: 600 }}>
+          <div className={styles.imageContainer}>
+            <Image
+              src="/images/bg.png"
+              alt="Logo Image"
+              fill
+              className={styles.image}
+            />
+          </div>
         </Grid>
       </Grid>
     </Box>

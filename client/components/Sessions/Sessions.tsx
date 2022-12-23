@@ -10,7 +10,7 @@ export const Sessions = ({ role, isNew, userName, id, socket }: any) => {
     <Box sx={{ flexGrow: 1, mt: 10 }}>
       <SessionHeader id={id} role={role} socket={socket} userName={userName} />
       <Grid sx={{ mt: 10 }} container spacing={2} justifyContent="space-around">
-        <Grid item>
+        <Grid md={5} item>
           <FilesArea
             isNew={isNew}
             userName={userName}
@@ -18,7 +18,7 @@ export const Sessions = ({ role, isNew, userName, id, socket }: any) => {
             socket={socket}
           />
         </Grid>
-        <Grid item>
+        <Grid md={5} item>
           <Chat isNew={isNew} userName={userName} id={id} socket={socket} />
         </Grid>
       </Grid>

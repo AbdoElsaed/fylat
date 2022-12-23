@@ -35,4 +35,10 @@ type RemoveSessionParams = {
   userName: string;
 };
 
-type AddMsgToSessionParams = { text: string; sender: string; sessionId: string };
+type AddMsgToSessionParams = {
+  text: string;
+  sender: string;
+  sessionId: string;
+};
+
+type JSONValue = string | number | boolean | { [key: string]: JSONValue };

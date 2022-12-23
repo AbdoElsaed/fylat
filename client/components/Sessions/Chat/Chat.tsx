@@ -71,7 +71,11 @@ export const Chat = ({ isNew, userName, id: sessionId, socket }: any) => {
         >
           {messages.map((msg, i) => (
             <Stack key={i}>
-              <Stack direction="row" sx={{ alignItems: "center" }} spacing={1}>
+              <Stack
+                direction="row"
+                sx={{ alignItems: "center", ml: 1 }}
+                spacing={1}
+              >
                 <Avatar {...stringAvatar(msg.sender)} />
                 <Typography component="p" gutterBottom sx={{ color: "#777" }}>
                   {msg.sender}
@@ -99,6 +103,7 @@ export const Chat = ({ isNew, userName, id: sessionId, socket }: any) => {
           sx={{
             alignItems: "flex-end",
             mt: 5,
+            m: 2,
           }}
         >
           <TextField

@@ -56,7 +56,7 @@ export const FilesArea = ({ isNew, userName, id: sessionId, socket }: any) => {
     <Box sx={{ flexGrow: 10 }}>
       <Grid item xs={12}>
         <Button
-          sx={{ mb: 5 }}
+          sx={{ mb: 5, ml: 3 }}
           variant="outlined"
           component="label"
           startIcon={<AttachFileIcon />}
