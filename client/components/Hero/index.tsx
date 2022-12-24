@@ -11,8 +11,8 @@ const Hero = ({ socket }: any) => {
   const isMobile = useDeviceDetect();
   return (
     <Box className={styles.container}>
-      <Grid container justifyContent="space-around">
-        <Grid item mt={10} md={6}>
+      <Grid container justifyContent="space-evenly">
+        <Grid item mt={10} xs={12} md={6}>
           <Typography variant="h3" className={styles.headline}>
             Sharing is caring
           </Typography>
@@ -21,7 +21,7 @@ const Hero = ({ socket }: any) => {
           </Typography>
           <HeroForm socket={socket} />
         </Grid>
-        <Grid item md={6} style={{ margin: 0, padding: 0, maxWidth: 600 }}>
+        <Grid item xs={10} sm={8} md={4}>
           <div className={styles.imageContainer}>
             <Image
               src="/images/bg.png"

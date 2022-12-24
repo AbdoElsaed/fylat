@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import styles from "@/styles/Hero.module.css";
 import Stack from "@mui/material/Stack";
+import Grid from "@mui/material/Grid";
 import TextField from "@mui/material/TextField";
 import LoadingButton from "@mui/lab/LoadingButton";
 import AddCircle from "@mui/icons-material/AddCircle";
@@ -67,71 +68,67 @@ const HeroForm = ({ socket }: any) => {
       spacing={4}
       noValidate
       autoComplete="off"
-      justifyContent="center"
-      alignItems="center"
-      alignContent="center"
     >
-      <div style={{ display: "flex", flexDirection: "row", width: "85%" }}>
-        <TextField
-          className={styles.textInput}
-          id="sessionId"
-          label="Session ID"
-          variant="outlined"
-          required
-          value={invitedSessionId ? invitedSessionId : id}
-          onChange={(e) => setId(e.target.value)}
-          disabled={!!invitedSessionId}
-        />
-        <Button
-          onClick={generateId}
-          size="small"
-          style={{ textTransform: "none" }}
-          disabled={!!invitedSessionId}
-        >
-          Random
-        </Button>
-      </div>
-      <div style={{ width: "85%" }}>
-        <TextField
-          className={styles.textInput}
-          id="username"
-          label="User Name"
-          variant="outlined"
-          required
-          value={userName}
-          onChange={(e) => setUserName(e.target.value)}
-        />
-      </div>
-      <Stack
-        spacing={2}
-        direction="row"
-        justifyContent="center"
-        alignItems="center"
-        alignContent="center"
-      >
-        <LoadingButton
-          onClick={() => handleClick(true)}
-          className={styles.btn}
-          variant="contained"
-          loadingPosition="end"
-          endIcon={<AddCircle />}
-          loading={startBtnLoading}
-          disabled={!!invitedSessionId}
-        >
-          {isMobile ? "Start" : "Start a new session"}
-        </LoadingButton>
-        <p>OR</p>
-        <LoadingButton
-          onClick={() => handleClick(false)}
-          className={styles.btn}
-          variant="outlined"
-          loadingPosition="end"
-          endIcon={<ArrowCircleDown />}
-          loading={joinBtnLoading}
-        >
-          {isMobile ? "Join" : "Join an exist session"}
-        </LoadingButton>
-      </Stack>
+      <Grid container spacing={2}>
+        <Grid item xs={10} sx={{ display: "flex", flexDirection: "row" }}>
+          <TextField
+            className={styles.textInput}
+            id="sessionId"
+            label="Session ID"
+            variant="outlined"
+            required
+            value={invitedSessionId ? invitedSessionId : id}
+            onChange={(e) => setId(e.target.value)}
+            disabled={!!invitedSessionId}
+          />
+          <Button
+            onClick={generateId}
+            size="small"
+            style={{ textTransform: "none" }}
+            disabled={!!invitedSessionId}
+          >
+            Random
+          </Button>
+        </Grid>
+        <Grid item xs={10}>
+          <TextField
+            className={styles.textInput}
+            id="username"
+            label="User Name"
+            variant="outlined"
+            required
+            value={userName}
+            onChange={(e) => setUserName(e.target.value)}
+          />
+        </Grid>
+      </Grid>
+      <Grid container spacing={1}>
+        <Grid item>
+          <LoadingButton
+            onClick={() => handleClick(true)}
+            className={styles.btn}
+            variant="contained"
+            loadingPosition="end"
+            endIcon={<AddCircle />}
+            loading={startBtnLoading}
+            disabled={!!invitedSessionId}
+          >
+            {isMobile ? "Start" : "Start a new session"}
+          </LoadingButton>
+        </Grid>
+        <Grid item>
+          <LoadingButton
+            onClick={() => handleClick(false)}
+            className={styles.btn}
+            variant="outlined"
+            loadingPosition="end"
+            endIcon={<ArrowCircleDown />}
+            loading={joinBtnLoading}
+          >
+            {isMobile ? "Join" : "Join an exist session"}
+          </LoadingButton>
+        </Grid>
+      </Grid>
     </Stack>
   );
 };
