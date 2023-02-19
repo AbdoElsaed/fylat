@@ -7,41 +7,27 @@ import Stack from "@mui/material/Stack";
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ShareIcon from "@mui/icons-material/Share";
-import LogoutIcon from "@mui/icons-material/Logout";
 import { useSnackbar } from "notistack";
+import { doc, deleteDoc } from "firebase/firestore";
+import { db, deleteSessionFiles } from "@/utils/firebase";
 
-export const SessionHeader = ({ id, role, socket, userName }: any) => {
+export const SessionHeader = ({ id, type }: any) => {
   const router = useRouter();
   const { enqueueSnackbar } = useSnackbar();
 
-  const handleClosingSessionAsAdmin = async () => {
-    await new Promise((resolve) => {
-      resolve(router.push("/"));
-    });
-    socket.emit("removeSession", { sessionId: id, userName }, (err: string) => {
-      if (err) {
-        console.error(err);
-        return enqueueSnackbar(err, { variant: "error" });
+  const deleteSession = async () => {
+    if (window.confirm(`you sure about deleting session : ${id} ?`)) {
+      try {
+        await deleteDoc(doc(db, "sessions", id));
+        await deleteSessionFiles(id);
+        enqueueSnackbar(`Session ${id} deleted successfully`, {
+          variant: "success",
+        });
+        router.push("/");
+      } catch (err: any) {
+        console.error(err.message);
       }
-      enqueueSnackbar(`Session ${id} closed successfully`, {
-        variant: "success",
-      });
-    });
-  };
-
-  const handleLeavingSessionAsMember = async () => {
-    await new Promise((resolve) => {
-      resolve(router.push("/"));
-    });
-    socket.emit("leaveSession", { sessionId: id, userName }, (err: string) => {
-      if (err) {
-        console.error(err);
-        return enqueueSnackbar(err, { variant: "error" });
-      }
-      enqueueSnackbar(`You left session : ${id}`, {
-        variant: "success",
-      });
-    });
+    }
   };
 
   const shareSessionLink = () => {
@@ -63,11 +49,6 @@ export const SessionHeader = ({ id, role, socket, userName }: any) => {
           <Typography sx={{ color: "#777", fontSize: "14px" }} component="p">
             (session will expire automaticaly after 2 hours).
           </Typography>
-          <Typography sx={{ color: "#777", fontSize: "14px" }} component="p">
-            {role === "admin"
-              ? "(As session admin, session will be permanently removed when you leave)."
-              : null}
-          </Typography>
         </Grid>
         <Grid item>
           <Stack direction="row" spacing={1}>
@@ -79,23 +60,14 @@ export const SessionHeader = ({ id, role, socket, userName }: any) => {
             >
               <ShareIcon />
             </IconButton>
-            {role === "admin" ? (
+            {type === "admin" ? (
               <IconButton
                 color="secondary"
-                title="Close Session"
-                aria-label="close session"
-                onClick={handleClosingSessionAsAdmin}
+                title="Delete Session"
+                aria-label="Delete session"
+                onClick={deleteSession}
               >
                 <DeleteIcon />
-              </IconButton>
-            ) : null}
-            {role === "member" ? (
-              <IconButton
-                title="Leave Session"
-                aria-label="Leave Session"
-                onClick={handleLeavingSessionAsMember}
-              >
-                <LogoutIcon />
               </IconButton>
             ) : null}
           </Stack>

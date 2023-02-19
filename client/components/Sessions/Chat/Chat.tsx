@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Dispatch, SetStateAction } from "react";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
@@ -8,63 +8,70 @@ import IconButton from "@mui/material/IconButton";
 import TextField from "@mui/material/TextField";
 import SendIcon from "@mui/icons-material/Send";
 import Avatar from "@mui/material/Avatar";
+import { doc, updateDoc, arrayUnion, onSnapshot } from "firebase/firestore";
 
+import { db } from "@/utils/firebase";
 import { stringAvatar } from "@/utils/chat";
 
-interface IMessage {
-  sender: string;
-  text: string;
+interface ChatParams {
+  isNew: boolean;
+  userName: string;
+  id: string;
+  messages: IMessage[];
 }
 
-export const Chat = ({ isNew, userName, id: sessionId, socket }: any) => {
+export const Chat = ({ isNew, userName, id, messages }: ChatParams) => {
   const [msg, setMsg] = useState<string>("");
-  const [messages, setMessages] = useState<IMessage[]>([]);
+
+  const sessionRef = doc(db, "sessions", id);
 
   let msgsContainerRef: any = useRef("");
 
   useEffect(() => {
     // update scroll height
     msgsContainerRef.current.scrollTop = msgsContainerRef.current.scrollHeight;
-  }, [messages]);
+  }, [messages.length]);
 
-  useEffect(() => {
-    // get initial msgs
-    socket.emit(
-      "getInitMsgs",
-      { sessionId },
-      (err: Error, msgs: IMessage[]) => {
-        if (!err) return setMessages(msgs);
-        console.error(err);
-      }
-    );
-
-    socket.on("newMsgAdded", (msgs: IMessage[]) => setMessages(msgs));
-  }, [socket, sessionId]);
-
-  const onCLick = () => {
+  const onCLick = async () => {
     if (!msg.trim()) return;
-    socket.emit(
-      "sendChatMsg",
-      { msg, userName, sessionId },
-      (err: Error, msgs: IMessage[]) => {
-        if (err) {
-          return console.error(err);
-        }
-        setMessages(msgs);
-      }
-    );
+    const newMsg: IMessage = { sender: userName, text: msg };
     setMsg("");
+    try {
+      await updateDoc(sessionRef, {
+        messages: arrayUnion(newMsg),
+      });
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
-    <Box sx={{ flexGrow: 10 }}>
+    <Box
+      sx={{
+        flexGrow: 10,
+      }}
+    >
+      <Typography
+        variant="h5"
+        letterSpacing={1}
+        sx={{
+          color: "#DDD",
+          textAlign: "center",
+          textShadow: "1px 1px 4px #158af8",
+          borderBottom: "1px solid #222",
+          width: "max-content",
+          margin: "auto",
+          mb: 3,
+        }}
+      >
+        Session Chat:
+      </Typography>
       <Stack sx={{ justifyContent: "center" }}>
         <Box
           ref={msgsContainerRef}
           style={{
             maxHeight: "300px",
             overflowY: "auto",
-            maxWidth: "500px",
             minWidth: "400px",
             scrollBehavior: "smooth",
           }}

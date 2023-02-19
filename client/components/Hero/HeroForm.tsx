@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { doc, setDoc, getDoc, updateDoc, arrayUnion } from "firebase/firestore";
+import { useSnackbar } from "notistack";
 import styles from "@/styles/Hero.module.css";
 import Stack from "@mui/material/Stack";
 import Grid from "@mui/material/Grid";
@@ -9,9 +11,9 @@ import ArrowCircleDown from "@mui/icons-material/ArrowCircleDown";
 import Button from "@mui/material/Button";
 import { useRouter } from "next/router";
 import { useDeviceDetect } from "@/utils/hooks";
-import { useSnackbar } from "notistack";
+import { db } from "@/utils/firebase";
 
-const HeroForm = ({ socket }: any) => {
+const HeroForm = () => {
   const { enqueueSnackbar } = useSnackbar();
   const isMobile = useDeviceDetect();
   const router = useRouter();
@@ -28,26 +30,84 @@ const HeroForm = ({ socket }: any) => {
 
   const generateId = () => setId(Math.random().toString(36).slice(2));
 
-  const goToSession = (isNew: boolean, err: string) => {
-    if (err) {
-      isNew ? setStartBtnLoading(false) : setJoinBtnLoading(false);
-      console.error(err);
-      enqueueSnackbar(err, { variant: "error" });
-    } else {
-      router.push(`/session/${id}?userName=${userName}&isNew=${isNew}`);
-    }
-  };
-
-  const joinRoom = (isNew: boolean) => {
-    const data = {
+  const createSession = async (isNew: boolean) => {
+    let newSession: ISession = {
       sessionId: id,
-      userName,
-      isNew,
+      users: [
+        {
+          userName,
+          type: isNew ? "admin" : "member",
+        },
+      ],
+      files: [],
+      messages: [],
     };
 
-    socket.emit("joinSession", data, (err: any) => {
-      goToSession(isNew, err);
-    });
+    try {
+      const existSession = await getDoc(doc(db, "sessions", id as string));
+
+      // if session is new and id is taken
+      if (existSession.exists() && isNew) {
+        setStartBtnLoading(false);
+        return enqueueSnackbar("session id already taken, try another one", {
+          variant: "error",
+        });
+      }
+
+      // if session doesnt exist
+      if (!existSession.exists() && !isNew) {
+        setJoinBtnLoading(false);
+        return enqueueSnackbar("No session exists with this ID", {
+          variant: "error",
+        });
+      }
+
+      // user joins if session exists
+      if (existSession.exists() && !isNew) {
+        const sessionData = existSession.data() as ISession;
+        const existUser = sessionData?.users?.find(
+          (u) => u.userName === userName
+        );
+
+        //if user exist
+        if (existUser) {
+          return router.push(
+            `/session/${id}?userName=${existUser.userName}&isNew=${isNew}&role=${existUser.type}`
+          );
+        } else {
+          // if user doesn't exist
+          const newUser: IUser = {
+            userName,
+            type: "member",
+          };
+          const sessionRef = doc(db, "sessions", id);
+          await updateDoc(sessionRef, {
+            users: arrayUnion(newUser),
+          });
+        }
+      }
+
+      // create a new session
+      if (!existSession.exists() && isNew) {
+        await setDoc(doc(db, "sessions", id), newSession);
+        // send a request to add the session to the message queue to be automatically deleted
+        const res = await fetch(`http://localhost:5000/mq/session/${id}`, {
+          method: "POST",
+        });
+        const d = await res.json();
+        console.log({ d });
+      }
+
+      router.push(
+        `/session/${id}?userName=${userName}&isNew=${isNew}&role=${
+          isNew ? "admin" : "member"
+        }`
+      );
+    } catch (err: any) {
+      isNew ? setStartBtnLoading(false) : setJoinBtnLoading(false);
+      console.error(err);
+      enqueueSnackbar(err.message, { variant: "error" });
+    }
   };
 
   const handleClick = (isNew: boolean) => {
@@ -55,7 +115,7 @@ const HeroForm = ({ socket }: any) => {
       return enqueueSnackbar("Please fill the form!", { variant: "error" });
     }
     isNew ? setStartBtnLoading(true) : setJoinBtnLoading(true);
-    joinRoom(isNew);
+    createSession(isNew);
   };
 
   return (

@@ -19,7 +19,7 @@ const Hero = ({ socket }: any) => {
           <Typography variant="h4" className={styles.slogan}>
             Start sharing files with your friends in a fun way
           </Typography>
-          <HeroForm socket={socket} />
+          <HeroForm />
         </Grid>
         <Grid item xs={10} sm={8} md={4}>
           <div className={styles.imageContainer}>

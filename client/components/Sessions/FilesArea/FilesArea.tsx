@@ -1,65 +1,66 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
-import IconButton from "@mui/material/IconButton";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemText from "@mui/material/ListItemText";
 import Typography from "@mui/material/Typography";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
-import DownloadIcon from "@mui/icons-material/Download";
+import FilesToUpload from "./FilesToUpload";
+import FilesToDownload from "./FilesToDownload";
 
-export const FilesArea = ({ isNew, userName, id: sessionId, socket }: any) => {
-  const [files, setFiles] = useState<any>([]);
-  const [filesToDownload, setFilesToDownload] = useState<any>([]);
+interface FilesAreaParams {
+  id: string;
+  filesToDownload: IFile[];
+}
 
-  useEffect(() => {
-    // get initial files
-    socket.emit("getInitFiles", { sessionId }, (err: Error, files: any) => {
-      if (!err) return setFilesToDownload(files);
-      console.error(err);
-    });
+export const FilesArea = ({
+  id: sessionId,
+  filesToDownload,
+}: FilesAreaParams) => {
+  const [showShareFilesBtn, setShowShareFilesBtn] = useState<boolean>(true);
+  const [filesToUpload, setFilesToUpload] = useState<File[]>([]);
+  const [uploadingFilesStatus, setUploadingFilesStatus] =
+    useState<uploadingFilesStatus>({});
 
-    socket.on("newFileAdded", (f: any) => setFilesToDownload(f));
-  }, [sessionId, socket]);
+  useEffect(() => {}, []);
 
-  const formatFiles = (files: any) => {
-    return [...files].map((f) => ({ filename: f.name, file: f }));
+  const setInitialUploadingStatus = (files: File[]) => {
+    const initialStatus = files.reduce((acc, f) => {
+      acc[f.name] = { uploaded: false };
+      return acc;
+    }, {} as uploadingFilesStatus);
+    setUploadingFilesStatus(initialStatus);
   };
 
-  function upload(files: any) {
-    const formattedFiles = formatFiles(files);
-    socket.emit(
-      "uploadfile",
-      { files: formattedFiles, sessionId },
-      (status: any) => {
-        console.log(status);
-      }
-    );
-  }
-
-  const downloadThisFile = (filename: any) => {
-    const { file } = filesToDownload.find((f: any) => f.filename === filename);
-    const blob = new Blob([file]);
-    const url = URL.createObjectURL(blob);
-    window.open(url);
-  };
-
-  const handleFilesChange = (files: any) => {
-    const f = [...files];
-    setFiles(f);
-    upload(files);
+  const handleFilesChange = (files: FileList) => {
+    // const formattedFiles = formatFiles(files);
+    const currFiles = [...files];
+    setInitialUploadingStatus(currFiles);
+    setFilesToUpload(currFiles);
   };
 
   return (
     <Box sx={{ flexGrow: 10 }}>
+      <Typography
+        variant="h5"
+        sx={{
+          color: "#DDD",
+          textShadow: "1px 1px 4px #158af8",
+          borderBottom: "1px solid #222",
+          width: "max-content",
+          margin: "auto",
+          mb: 3,
+        }}
+        letterSpacing={1}
+      >
+        Session Files:
+      </Typography>
       <Grid item xs={12}>
         <Button
           sx={{ mb: 5, ml: 3 }}
           variant="outlined"
           component="label"
           startIcon={<AttachFileIcon />}
+          disabled={!showShareFilesBtn}
         >
           Share Files
           <input
@@ -67,42 +68,27 @@ export const FilesArea = ({ isNew, userName, id: sessionId, socket }: any) => {
             type="file"
             multiple
             hidden
-            onChange={(e) => handleFilesChange(e.target.files)}
+            onChange={(e) => handleFilesChange(e.target.files as FileList)}
           />
         </Button>
+
+        {filesToUpload && filesToUpload.length ? (
+          <FilesToUpload
+            uploadingFilesStatus={uploadingFilesStatus}
+            setUploadingFilesStatus={setUploadingFilesStatus}
+            filesToUpload={filesToUpload}
+            setFilesToUpload={setFilesToUpload}
+            sessionId={sessionId}
+            setShowShareFilesBtn={setShowShareFilesBtn}
+          />
+        ) : null}
+
         {filesToDownload && filesToDownload.length ? (
-          <List
-            sx={{
-              width: "100%",
-              maxWidth: 500,
-              maxHeight: 400,
-              overflowY: "auto",
-              marginBottom: 5,
-            }}
-          >
-            {filesToDownload.map((f: any) => (
-              <ListItem
-                key={f.filename}
-                secondaryAction={
-                  <IconButton
-                    title="Download"
-                    edge="end"
-                    aria-label="download"
-                    onClick={() => downloadThisFile(f.filename)}
-                  >
-                    <DownloadIcon />
-                  </IconButton>
-                }
-              >
-                <ListItemText
-                  sx={{ overflowWrap: "break-word" }}
-                  primary={f.filename}
-                />
-              </ListItem>
-            ))}
-          </List>
+          <FilesToDownload filesToDownload={filesToDownload} />
         ) : (
-          <Typography component="div">No files yet.</Typography>
+          <Typography sx={{ ml: 2 }} component="div" color="#888">
+            No files to download!.
+          </Typography>
         )}
       </Grid>
     </Box>

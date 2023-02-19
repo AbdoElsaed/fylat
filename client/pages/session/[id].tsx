@@ -1,92 +1,52 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { useRouter } from "next/router";
-import { useSnackbar } from "notistack";
+import { doc, getDoc } from "firebase/firestore";
 import { Sessions } from "@/components/Sessions";
 import { useBeforeUnload } from "@/hooks/userBeforeUnload";
+import { db } from "@/utils/firebase";
 
 const roles = ["admin", "member"];
 
-const SessionsPage = ({ socket }: any) => {
-  const [role, setRole] = useState<string>("");
+interface SessionPageProps {
+  user: IUser;
+  authorizedUser: boolean;
+}
+
+const SessionsPage = ({ user, authorizedUser }: SessionPageProps) => {
   const router = useRouter();
-  const { enqueueSnackbar } = useSnackbar();
-  const { setIsValidSession } = useBeforeUnload();
+  const { id, isNew } = router.query;
 
-  const { id, isNew, userName } = router.query;
-
-  useEffect(() => {
-    socket.emit(
-      "getRoleType",
-      { sessionId: id, userName },
-      (err: string, serverRole: string) => {
-        if (err) {
-          console.error(err);
-          return enqueueSnackbar(err, { variant: "error" });
-        }
-        setRole(serverRole ? serverRole : "other");
-        setIsValidSession(roles.includes(serverRole) ? true : false);
-      }
+  if (!authorizedUser)
+    return (
+      <h1 style={{ color: "#888", textAlign: "center" }}> Not Authorized </h1>
     );
 
-    socket.on("sessionIsClosed", ({ sessionId, userName: admin }: any) => {
-      if (sessionId === id) {
-        router.push({
-          pathname: "/",
-          query: { onClosedSession: sessionId },
-        });
-        enqueueSnackbar(`this session has been closed by admin ${admin}`, {
-          variant: "info",
-        });
-      }
-    });
-
-    socket.on("sessionIsExpired", ({ sessionId }: any) => {
-      console.log(sessionId, "session is expired");
-      if (sessionId === id) {
-        router.push({
-          pathname: "/",
-          query: { onClosedSession: sessionId },
-        });
-        enqueueSnackbar(`session '${sessionId}' has been expired`, {
-          variant: "info",
-        });
-      }
-    });
-
-    socket.on("userLeft", ({ sessionId, userName: userLeft }: any) => {
-      if (sessionId === id) {
-        enqueueSnackbar(`${userLeft} left the session!`, {
-          variant: "info",
-        });
-      }
-    });
-
-    socket.on("newUserJoined", ({ userName, sessionId }: any) => {
-      if (sessionId === id) {
-        enqueueSnackbar(`${userName} joined the session!`, {
-          variant: "info",
-        });
-      }
-    });
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, socket, userName]);
-
-  return roles.includes(role) ? (
+  return (
     <div>
       <Sessions
-        role={role}
-        isNew={isNew}
-        userName={userName}
-        id={id}
-        socket={socket}
+        user={user}
+        isNew={isNew === "true" ? true : (false as boolean)}
+        id={id as string}
       />
     </div>
-  ) : (
-    <h2 style={{ color: "#777", textAlign: "center", margin: 50 }}>
-      Not authorized to access this session
-    </h2>
   );
 };
+
+export async function getServerSideProps(context: any) {
+  const { id, userName, role } = context.query;
+  const sessionRef = doc(db, "sessions", id as string);
+  const snap = await getDoc(sessionRef);
+  const session = snap?.data() as ISession;
+  const user =
+    session &&
+    (session?.users?.find((u: IUser) => u.userName === userName) as IUser);
+
+  return {
+    props: {
+      authorizedUser: role === user?.type,
+      user: user ?? {},
+    },
+  };
+}
 
 export default SessionsPage;
